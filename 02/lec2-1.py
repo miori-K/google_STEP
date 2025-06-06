@@ -20,17 +20,20 @@ def calculate_hash(key):
         hash += (i+1)*ord(key[i])
     return hash
 
+#実装した再ハッシュ
 def rehash(self):
-    old_buckets = self.buckets
+    old_buckets = self.buckets 
     new_size = self._next_prime(self.bucket_size * 2)
     self.buckets = [None] * new_size
     self.bucket_size = new_size
     self.item_count = 0
+    #新しくバケットサイズを2倍にして
 
     for item in old_buckets:
         while item:
             self.put(item.key, item.value)
             item = item.next
+            #アイテムを新しいところに入れる
     
 
 # An item object that represents one key - value pair in the hash table.
@@ -106,12 +109,13 @@ class HashTable:
     # |key|: The key.
     # Return value: True if the item is found and deleted successfully. False
     #               otherwise.
+    #実装したdelete
     def delete(self, key):
         assert type(key) == str
         self.check_size()
         bucket_index = calculate_hash(key) % self.bucket_size
         item = self.buckets[bucket_index]
-        prev = None #一つ前のアイテム
+        prev = None #一つ前のアイテムをprevとして設定
         while item:
             if item.key == key:
                 if prev is None:
@@ -136,7 +140,7 @@ class HashTable:
     # Note: Don't change this function.
     def check_size(self):
         if self.bucket_size >= 100 and self.item_count >= self.bucket_size * 0.7:
-            self.rehash()
+            self.rehash()#7割以上埋まってしまったら再ハッシュする
         assert (self.bucket_size < 100 or
                 self.item_count >= self.bucket_size * 0.3)
 

@@ -1,6 +1,8 @@
 import sys
 from collections import Counter
 
+##早くなる方法(最初にスコアも計算した辞書を作って保存する方法）で課題2をやり直そうとしています！まだ途中です。
+
 def abc_and_score(dict):
     ABC_dict = []
     for word in dict:
