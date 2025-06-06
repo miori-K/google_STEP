@@ -24,7 +24,7 @@ def calculate_hash(key):
 #実装した再ハッシュ
 def rehash(self):
     old_buckets = self.buckets 
-    new_size = self._next_prime(self.bucket_size * 2)
+    new_size = self.bucket_size * 2
     self.buckets = [None] * new_size
     self.bucket_size = new_size
     self.item_count = 0
