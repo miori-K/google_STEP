@@ -39,7 +39,8 @@ class Test(unittest.TestCase):
     def test1(self):
         with open('words.txt', 'r') as f:
             dictionary = f.read().splitlines() 
-        self.assertEqual(solution("cta",dictionary), ["act","cat"])
+        self.assertEqual(solution("cta",dictionary), ["act","cat"])#setupdematomerareru
+        #dictmotestsuru
     def test2(self):
         with open('words.txt', 'r') as f:
             dictionary = f.read().splitlines() 

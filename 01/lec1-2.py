@@ -5,7 +5,7 @@ def ABCcount(word):
     count = Counter(word)
     return [count.get(chr(i), 0) for i in range(ord('a'), ord('z')+1)]
 
-def score_count(words):
+def score_count(words):#words = wordにして一個一個みていく
     ABC_score = [1,3,2,2,1,3,3,1,1,4,4,2,2,1,1,3,4,1,1,1,2,3,3,4,3,4]
     score = 0
     for word in words:
@@ -26,11 +26,11 @@ def answer(score_words_list):
             max_list.append(score_words_list[i][0])
     return max_list,max_score
 
-def check(input_word,ABC_dictinoary):
+def check(input_word,ABC_dictinoary):#
     input_word_count = ABCcount(input_word)
     count_ABC_dictionary = []
     words = []
-    for word in range(len(ABC_dictionary)):
+    for word in range(len(ABC_dictionary)): #change word = i にした方がわかりやすい
         count_ABC_dictionary = ABC_dictinoary[word][1]
         for i in range(26):
             if count_ABC_dictionary[i] > input_word_count[i]:
@@ -38,7 +38,7 @@ def check(input_word,ABC_dictinoary):
         else:
             score = score_count(ABC_dictionary[word][0])
             words.append([ABC_dictionary[word][0],score])
-    return input_word,words
+    return input_word,words #input_wordは入力なので返さない
 
 def input_output(input_filename, output_filename, ABC_dictionary):
     total_score = 0
@@ -47,7 +47,7 @@ def input_output(input_filename, output_filename, ABC_dictionary):
 
     with open(output_filename, 'w') as out_file:
         for word in words:
-            input_word, words_list = check(word, ABC_dictionary)
+            input_word, words_list = check(word, ABC_dictionary)#input_wordはwordのままで
             max_list, max_score = answer(words_list)
             out_file.write(f"{input_word}: {max_list}\n")
             out_file.write(f"score: {max_score}\n")
