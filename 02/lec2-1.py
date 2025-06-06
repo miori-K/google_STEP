@@ -18,6 +18,7 @@ def calculate_hash(key):
     hash = 0
     for i in range(len(key)):
         hash += (i+1)*ord(key[i])
+        #前のものだと、abc,cbaの区別がつかないので何番目の文字でも区別するようにした
     return hash
 
 #実装した再ハッシュ
