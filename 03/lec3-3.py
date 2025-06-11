@@ -15,7 +15,6 @@ def read_number(line, index):
     token = {'type': 'NUMBER', 'number': number}
     return token, index
 
-
 def read_plus(line, index):
     token = {'type': 'PLUS'}
     return token, index + 1
@@ -24,12 +23,12 @@ def read_minus(line, index):
     token = {'type': 'MINUS'}
     return token, index + 1
 
-def read_kakezan(line, index):
-    token = {'type': 'KAKEZAN'}
+def read_mult(line, index):
+    token = {'type': 'MULT'}
     return token, index + 1
 
-def read_warizan(line, index):
-    token = {'type': 'WARIZAN'}
+def read_divi(line, index):
+    token = {'type': 'DIVI'}
     return token, index + 1
 
 def read_open(line,index):
@@ -51,9 +50,9 @@ def tokenize(line):
         elif line[index] == '-':
             (token, index) = read_minus(line, index)
         elif line[index] == '*':
-            (token, index) = read_kakezan(line, index)
+            (token, index) = read_mult(line, index)
         elif line[index] == '/':
-            (token, index) = read_warizan(line, index)
+            (token, index) = read_divi(line, index)
         elif line[index] == '(':
             (token, index) = read_open(line, index)
         elif line[index] == ')':
@@ -65,52 +64,50 @@ def tokenize(line):
     return tokens
 
 def evaluate(tokens): #メインの計算（）に対応
-    index = 1
-    open_count = 0
-    close_count = 0
+    index = 0
+    stack = []
 
     while index < len(tokens):
         if tokens[index]['type'] == 'OPEN':
-            open_index = index #(を保存
-            open_count += 1
+            stack.append(index) #(を保存
             index += 1
         elif tokens[index]['type'] == 'CLOSE':
-            close_index = index #)を保存
-            close_count += 1 
-            index += 1
-            elif open_count == close_count:
+            if stack == []:
+                break
+            else:
+                open_index = stack.pop()#最後に入れた(を取り出す
+                close_index = index
                 inner_tokens = tokens[open_index +1 :close_index] #(は含めない
                 value = evaluate(inner_tokens) #再帰呼び出し
-                tokens = tokens[:open_index] + [{'type': 'NUMBER', 'number': value}] + tokens[close_index + 1:] #()部分を書き換えてtoken列を変更
+                tokens[open_index:close_index+1] = [{'type': 'NUMBER', 'number': value}]#()部分を書き換えてtoken列を変更
+                index = 0 #初めに戻る
         else:
             index += 1
-    tokens = evaluate1(tokens)
-    return evaluate2(tokens)
 
-def evaluate1(tokens): #掛け算、割り算を計算
+    tokens = multdivi(tokens)
+    return plusminus(tokens)
+
+def multdivi(tokens): #掛け算、割り算を計算
     answer = 0
     tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
-    index = 1
+    index = 0
 
     while index < len(tokens):
-        if tokens[index]['type'] == 'KAKEZAN': 
-            answer +=tokens[index-1]['number']*tokens[index+1]['number']
-            #tokenを計算結果にする
-            tokens[index-1] = {'type': 'NUMBER', 'number': answer}
-            tokens[index] = {'type': 'NUMBER', 'number': 0}
-            tokens[index+1] = {'type': 'NUMBER', 'number': 0}
-        elif tokens[index]['type'] == 'WARIZAN':
-            answer +=tokens[index-1]['number']/tokens[index+1]['number']
-            #tokenを計算結果にする
-            tokens[index-1] = {'type': 'NUMBER', 'number': answer}
-            tokens[index] = {'type': 'NUMBER', 'number': 0}
-            tokens[index+1] = {'type': 'NUMBER', 'number': 0}
+        if tokens[index]['type'] == 'MULT':
+            result =tokens[index-1]['number']*tokens[index+1]['number']
+            tokens[index-1:index+2] =  [{'type': 'NUMBER', 'number': result}]
+            index -= 1
+        elif tokens[index]['type'] == 'DIVI':
+            result =tokens[index-1]['number']/tokens[index+1]['number']
+            tokens[index-1:index+2] =  [{'type': 'NUMBER', 'number': result}]
+            index -= 1
         index += 1
+
     return tokens
 
-def evaluate2(tokens): #足し算、引き算を計算
+def plusminus(tokens): #足し算、引き算を計算
     answer = 0
-    index = 1
+    index = 0
     while index < len(tokens):
         if tokens[index]['type'] == 'NUMBER':
             if tokens[index - 1]['type'] == 'PLUS':
@@ -138,8 +135,10 @@ def run_test():
     test("9/2+4.0")
     test("2.5+5*10")
     test("4-8*0")
+    test("6/3*3")
     test("3*(9-3)")
-    test("((8+2)*2)-7")
+    test("((8+2)-7)*2")
+    test("2+(9-3)*4/(5-3)+((8-4)/2)")
     print("==== Test finished! ====\n")
 
 run_test()

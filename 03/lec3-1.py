@@ -55,21 +55,18 @@ def tokenize(line):
 
 def evaluate(tokens):
     answer = 0
-    result = 0
     tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
     index = 1
 
     while index < len(tokens):
         if tokens[index]['type'] == 'KAKEZAN':
-            result +=tokens[index-1]['number']*tokens[index+1]['number']
-            tokens[index-1] = {'type': 'NUMBER', 'number': result}
-            tokens[index] = {'type': 'NUMBER', 'number': 0}
-            tokens[index+1] = {'type': 'NUMBER', 'number': 0}
+            result =tokens[index-1]['number']*tokens[index+1]['number']
+            tokens[index-1:index+2] =  [{'type': 'NUMBER', 'number': result}]
+            index -= 1
         elif tokens[index]['type'] == 'WARIZAN':
-            result +=tokens[index-1]['number']/tokens[index+1]['number']
-            tokens[index-1] = {'type': 'NUMBER', 'number': result}
-            tokens[index] = {'type': 'NUMBER', 'number': 0}
-            tokens[index+1] = {'type': 'NUMBER', 'number': 0}
+            result =tokens[index-1]['number']/tokens[index+1]['number']
+            tokens[index-1:index+2] =  [{'type': 'NUMBER', 'number': result}]
+            index -= 1
         index += 1
     
     index = 1
@@ -79,6 +76,7 @@ def evaluate(tokens):
                 answer += tokens[index]['number']
             elif tokens[index - 1]['type'] == 'MINUS':
                 answer -= tokens[index]['number']
+
         index += 1
     return answer
 
@@ -101,6 +99,8 @@ def run_test():
     test("9/2+4.0")
     test("2.5+5*10")
     test("4-8*0")
+    test("6/3*3")
+    test("7.03-0.02/0.01*2-4*12")
     print("==== Test finished! ====\n")
 
 run_test()

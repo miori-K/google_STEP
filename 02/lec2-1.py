@@ -19,23 +19,7 @@ def calculate_hash(key):
     for i in range(len(key)):
         hash += (i+1)*ord(key[i])
         #前のものだと、abc,cbaの区別がつかないので何番目の文字でも区別するようにした
-    return hash
-
-#実装した再ハッシュ
-def rehash(self):
-    old_buckets = self.buckets 
-    new_size = self.bucket_size * 2
-    self.buckets = [None] * new_size
-    self.bucket_size = new_size
-    self.item_count = 0
-    #新しくバケットサイズを2倍にして
-
-    for item in old_buckets:
-        while item:
-            self.put(item.key, item.value)
-            item = item.next
-            #アイテムを新しいところに入れる
-    
+    return hash   
 
 # An item object that represents one key - value pair in the hash table.
 class Item:
@@ -129,6 +113,21 @@ class HashTable:
             item = item.next
         
         return False
+
+        #実装した再ハッシュ
+    def rehash(self):
+        old_buckets = self.buckets 
+        new_size = self.bucket_size * 2
+        self.buckets = [None] * new_size
+        self.bucket_size = new_size
+        self.item_count = 0
+        #新しくバケットサイズを2倍にして
+
+        for item in old_buckets:
+            while item:
+                self.put(item.key, item.value)
+                item = item.next
+                #アイテムを新しいところに入れる
 
     # Return the total number of items in the hash table.
     def size(self):
