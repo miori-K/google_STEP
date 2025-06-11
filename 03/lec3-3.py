@@ -77,7 +77,7 @@ def evaluate(tokens): #メインの計算（）に対応
             else:
                 open_index = stack.pop()#最後に入れた(を取り出す
                 close_index = index
-                inner_tokens = tokens[open_index +1 :close_index] #(は含めない
+                inner_tokens = tokens[open_index +1 :close_index] 
                 value = evaluate(inner_tokens) #再帰呼び出し
                 tokens[open_index:close_index+1] = [{'type': 'NUMBER', 'number': value}]#()部分を書き換えてtoken列を変更
                 index = 0 #初めに戻る
