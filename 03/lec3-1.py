@@ -24,12 +24,12 @@ def read_minus(line, index):
     token = {'type': 'MINUS'}
     return token, index + 1
 
-def read_kakezan(line, index):
-    token = {'type': 'KAKEZAN'}
+def read_mult(line, index):
+    token = {'type': 'MULT'}
     return token, index + 1
 
-def read_warizan(line, index):
-    token = {'type': 'WARIZAN'}
+def read_divi(line, index):
+    token = {'type': 'DIVI'}
     return token, index + 1
 
 def tokenize(line):
@@ -43,43 +43,47 @@ def tokenize(line):
         elif line[index] == '-':
             (token, index) = read_minus(line, index)
         elif line[index] == '*':
-            (token, index) = read_kakezan(line, index)
+            (token, index) = read_mult(line, index)
         elif line[index] == '/':
-            (token, index) = read_warizan(line, index)
+            (token, index) = read_divi(line, index)
         else:
             print('Invalid character found: ' + line[index])
             exit(1)
         tokens.append(token)
     return tokens
 
-
 def evaluate(tokens):
-    answer = 0
+    tokens1 = multdivi(tokens)
+    return plusminus(tokens1)
+
+def multdivi(tokens): #掛け算、割り算を計算
     tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
-    index = 1
+    index = 0
 
     while index < len(tokens):
-        if tokens[index]['type'] == 'KAKEZAN':
+        if tokens[index]['type'] == 'MULT':
             result =tokens[index-1]['number']*tokens[index+1]['number']
             tokens[index-1:index+2] =  [{'type': 'NUMBER', 'number': result}]
             index -= 1
-        elif tokens[index]['type'] == 'WARIZAN':
+        elif tokens[index]['type'] == 'DIVI':
             result =tokens[index-1]['number']/tokens[index+1]['number']
             tokens[index-1:index+2] =  [{'type': 'NUMBER', 'number': result}]
             index -= 1
         index += 1
-    
-    index = 1
+
+    return tokens
+
+def plusminus(tokens): #足し算、引き算を計算
+    answer = 0
+    index = 0
     while index < len(tokens):
         if tokens[index]['type'] == 'NUMBER':
             if tokens[index - 1]['type'] == 'PLUS':
                 answer += tokens[index]['number']
             elif tokens[index - 1]['type'] == 'MINUS':
                 answer -= tokens[index]['number']
-
         index += 1
     return answer
-
 
 def test(line):
     tokens = tokenize(line)

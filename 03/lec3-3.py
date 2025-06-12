@@ -63,7 +63,12 @@ def tokenize(line):
         tokens.append(token)
     return tokens
 
-def evaluate(tokens): #メインの計算（）に対応
+def evaluate(tokens):
+    tokens1 = parentheses(tokens)
+    tokens2 = multdivi(tokens)
+    return plusminus(tokens2)
+
+def parentheses(tokens): #メインの計算（）に対応
     index = 0
     stack = []
 
@@ -78,7 +83,7 @@ def evaluate(tokens): #メインの計算（）に対応
                 open_index = stack.pop()#最後に入れた(を取り出す
                 close_index = index
                 inner_tokens = tokens[open_index +1 :close_index] 
-                value = evaluate(inner_tokens) #再帰呼び出し
+                value = parentheses(inner_tokens) #再帰呼び出し
                 tokens[open_index:close_index+1] = [{'type': 'NUMBER', 'number': value}]#()部分を書き換えてtoken列を変更
                 index = 0 #初めに戻る
         else:
@@ -88,7 +93,6 @@ def evaluate(tokens): #メインの計算（）に対応
     return plusminus(tokens)
 
 def multdivi(tokens): #掛け算、割り算を計算
-    answer = 0
     tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
     index = 0
 
@@ -138,6 +142,7 @@ def run_test():
     test("6/3*3")
     test("3*(9-3)")
     test("((8+2)-7)*2")
+    test("7.03-0.02/0.01*2-4*12")
     test("2+(9-3)*4/(5-3)+((8-4)/2)")
     print("==== Test finished! ====\n")
 
