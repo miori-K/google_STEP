@@ -68,7 +68,7 @@ def evaluate(tokens):
     tokens2 = multdivi(tokens)
     return plusminus(tokens2)
 
-def parentheses(tokens): #メインの計算（）に対応
+def parentheses(tokens): #（）に対応
     index = 0
     stack = []
 
