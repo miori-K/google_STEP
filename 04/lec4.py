@@ -87,17 +87,18 @@ class Wikipedia:
         visited = {}
         visited[start_key] = None
         queue.append(start_key)
-        while queue:
+        while queue: #キューがなくなるまでノードの子を検索していき、ゴールに辿り着いたら終わり
             node = queue.popleft()
             for child in self.links[node]:
                 if child == goal_key:
                     visited[child] = node
                     print("Found")
-                    path = []
+                    path = [] #道順を記録する用
                     node = goal_key
-                    while node is not None:
+                    while node is not None: #goalから辿った道を遡る
                         path.append(self.titles[node])
                         node = visited[node]
+                    print(path)
                     path.reverse()
                     print(path)
                     print(len(path))
@@ -121,9 +122,7 @@ class Wikipedia:
                 if self.links[id] == []:
                     for j in point_count.keys():
                         point_count[j] += prev_count[id]/len(point_count)
-                #for dst in self.links[id]:
-                        #point_count[dst] += prev_count[id]*0.85/len(self.links[id])
-                for j in point_count.keys():
+                for j in point_count.keys(): #ここが重い？
                     point_count[j] += prev_count[id]*0.15/len(point_count)
                     if j in self.links[id]:
                         point_count[j] += prev_count[id]*0.85/len(self.links[id])
@@ -178,7 +177,7 @@ if __name__ == "__main__":
     # Example
     #wikipedia.find_most_linked_pages()
     # Homework #1
-    #wikipedia.find_shortest_path("A", "F")
+    wikipedia.find_shortest_path("A", "F")
     #wikipedia.find_shortest_path("渋谷", "パレートの法則")
     #wikipedia.find_shortest_path("渋谷", "9月22日")
     #wikipedia.find_shortest_path("渋谷", "小野妹子")
