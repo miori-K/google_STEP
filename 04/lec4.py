@@ -1,4 +1,5 @@
 #python lec4.py pages_small.txt links_small.txt
+#python lec4.py pages_small2.txt links_small2.txt
 #python lec4.py pages_medium.txt links_medium.txt
 #python lec4.py pages_large.txt links_large.txt
 
@@ -98,7 +99,6 @@ class Wikipedia:
                     while node is not None: #goalから辿った道を遡る
                         path.append(self.titles[node])
                         node = visited[node]
-                    print(path)
                     path.reverse()
                     print(path)
                     print(len(path))
@@ -109,6 +109,7 @@ class Wikipedia:
         print("Not Found")
 
     # Homework #2: Calculate the page ranks and print the most popular pages.
+    #辞書を二つ用意して一つに古い値を記録して更新していく方法
     def find_most_popular_pages(self):
         point_count = {}
         prev_count = {}
@@ -127,8 +128,45 @@ class Wikipedia:
                     if j in self.links[id]:
                         point_count[j] += prev_count[id]*0.85/len(self.links[id])
 
-            for id in self.titles.keys():
+            for id in self.titles.keys(): #ここが重い？
                 prev_count[id] = point_count[id]
+            #print(prev_count)
+            #print(point_count)
+
+        sorted_point = sorted(point_count.items(), key=lambda x:x[1])#pointでソートする
+        print("find_most_popular_pages:")
+        #print(sorted_point)
+        print(sorted_point[len(self.titles)-1])#ソートした最後の一番大きものを取り出す
+        print(next(v for k, v in self.titles.items() if k == sorted_point[len(self.titles)-1][0]))
+
+    #軽くしてみる
+    def find_most_popular_pages2(self):
+        point_count = {}
+        prev_count = {}
+        for id in self.titles.keys():
+            point_count[id] = 1
+            prev_count[id] = 1
+        
+        for i in range(5):
+            for id in self.titles.keys():
+                point_count[id] -=prev_count[id]
+                if self.links[id] == []:
+                    for j in point_count.keys():
+                        point_count[j] += prev_count[id]/len(point_count)
+                for j in point_count.keys(): #ここが重い？
+                    point_count[j] += prev_count[id]*0.15/len(point_count)
+                    if j in self.links[id]:
+                        point_count[j] += prev_count[id]*0.85/len(self.links[id])
+            
+            for id in self.titles.keys():
+                prev_count[id] -=point_count[id]
+                if self.links[id] == []:
+                    for j in prev_count.keys():
+                        prev_count[j] += point_count[id]/len(prev_count)
+                for j in prev_count.keys(): #ここが重い？
+                    prev_count[j] += point_count[id]*0.15/len(prev_count)
+                    if j in self.links[id]:
+                        prev_count[j] += point_count[id]*0.85/len(self.links[id])
             #print(prev_count)
             #print(point_count)
 
@@ -178,10 +216,12 @@ if __name__ == "__main__":
     #wikipedia.find_most_linked_pages()
     # Homework #1
     wikipedia.find_shortest_path("A", "F")
+    #wikipedia.find_shortest_path("C", "M")
     #wikipedia.find_shortest_path("渋谷", "パレートの法則")
     #wikipedia.find_shortest_path("渋谷", "9月22日")
     #wikipedia.find_shortest_path("渋谷", "小野妹子")
     # Homework #2
     wikipedia.find_most_popular_pages()
+    wikipedia.find_most_popular_pages2()
     # Homework #3 (optional)
     #wikipedia.find_longest_path("渋谷", "池袋")
