@@ -130,24 +130,25 @@ class Wikipedia:
             point_count[id] = 1
             prev_count[id] = 1
         
-        #for i in range(3):  #mediumでは1回回すのに30分もかかってしまったので、diffは考えずに回す回数を指定した
         while diff > 0.01:
+            all_point = 0
+            prev_all_point = len(point_count)*0.15
             for id in self.titles.keys():
-                point_count[id] += 0.15 #全てに0.15を足す
-                point_count[id] -=prev_count[id]
+                point_count[id] = prev_all_point/len(point_count) #全体を初期化
 
-                if self.links[id] == []: #どこにも繋がっていない場合
-                    for j in point_count.keys(): 
-                        point_count[j] += prev_count[id]*0.85/len(point_count)
-                else:
-                    for j in self.links[id]: #繋がってる場合
+            for id in self.titles.keys():
+                if self.links[id] != []: #繋がってる場合
+                    for j in self.links[id]: 
                         point_count[j] += prev_count[id]*0.85/len(self.links[id])
+                        all_point += prev_count[id]*0.15
+                else: #繋がっていない場合
+                    all_point += prev_count[id]
 
+            prev_all_point = all_point    
             diff = 0
-            for id in self.titles.keys(): #更新&差を計算
+            for id in self.titles.keys(): #更新と差の計算
                 diff += abs(point_count[id] - prev_count[id])
                 prev_count[id] = point_count[id]
-            #print(i)
             #print(prev_count)
             #print(point_count)
 
