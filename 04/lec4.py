@@ -47,7 +47,19 @@ class Wikipedia:
         #print(self.links)
         print()
 
-
+      
+    def find_title(self,id):
+        for key, value in self.titles.items():
+            if key == id:
+                return value
+        return None
+    
+    def find_id(self,title):
+        for key, value in self.titles.items():
+            if value == title:
+                return key
+        return None
+    
     # Example: Find the longest titles.
     def find_longest_titles(self):
         titles = sorted(self.titles.values(), key=len, reverse=True)
@@ -82,8 +94,8 @@ class Wikipedia:
     # 'start': A title of the start page.
     # 'goal': A title of the goal page.
     def find_shortest_path(self, start, goal):
-        start_key = next(k for k, v in self.titles.items() if v == start) #startのidを探す
-        goal_key = next(k for k, v in self.titles.items() if v == goal) #goalのidを探す
+        start_key = self.find_id(start)  #startのidを探す
+        goal_key = self.find_id(goal) #goalのidを探す
         queue = deque()
         visited = {}
         visited[start_key] = None
@@ -91,90 +103,60 @@ class Wikipedia:
         while queue: #キューがなくなるまでノードの子を検索していき、ゴールに辿り着いたら終わり
             node = queue.popleft()
             for child in self.links[node]:
-                if child == goal_key:
+                if child == goal_key:#goalが見つかった時
                     visited[child] = node
                     print("Found")
-                    path = [] #道順を記録する用
+                    path = [] 
                     node = goal_key
-                    while node is not None: #goalから辿った道を遡る
+                    while node is not None: #goalから辿った道を遡って記録
                         path.append(self.titles[node])
                         node = visited[node]
                     path.reverse()
                     print(path)
-                    print(len(path))
+                    print(len(path)) 
                     return
-                if not child in visited:
+                if not child in visited: #goalが見つからなかったらさらに子をキューに入れる
                     visited[child] = node
                     queue.append(child)
         print("Not Found")
 
     # Homework #2: Calculate the page ranks and print the most popular pages.
-    #辞書を二つ用意して一つに古い値を記録して更新していく方法
+    #辞書を2つ用意して1つに古い値を記録して更新していく方法
     def find_most_popular_pages(self):
         point_count = {}
         prev_count = {}
-        for id in self.titles.keys():
+        diff = 1
+        for id in self.titles.keys(): #初期値を設定
             point_count[id] = 1
             prev_count[id] = 1
         
-        for i in range(10):
+        #for i in range(3):  #mediumでは1回回すのに30分もかかってしまったので、diffは考えずに回す回数を指定した
+        while diff > 0.01:
             for id in self.titles.keys():
+                point_count[id] += 0.15 #全てに0.15を足す
                 point_count[id] -=prev_count[id]
-                if self.links[id] == []:
-                    for j in point_count.keys():
-                        point_count[j] += prev_count[id]/len(point_count)
-                for j in point_count.keys(): #ここが重い？
-                    point_count[j] += prev_count[id]*0.15/len(point_count)
-                    if j in self.links[id]:
+
+                if self.links[id] == []: #どこにも繋がっていない場合
+                    for j in point_count.keys(): 
+                        point_count[j] += prev_count[id]*0.85/len(point_count)
+                else:
+                    for j in self.links[id]: #繋がってる場合
                         point_count[j] += prev_count[id]*0.85/len(self.links[id])
 
-            for id in self.titles.keys(): #ここが重い？
+            diff = 0
+            for id in self.titles.keys(): #更新&差を計算
+                diff += abs(point_count[id] - prev_count[id])
                 prev_count[id] = point_count[id]
+            #print(i)
             #print(prev_count)
             #print(point_count)
 
-        sorted_point = sorted(point_count.items(), key=lambda x:x[1])#pointでソートする
+        sorted_point = sorted(point_count.items(),key=lambda x:x[1], reverse = True)#pointでソートする
         print("find_most_popular_pages:")
         #print(sorted_point)
-        print(sorted_point[len(self.titles)-1])#ソートした最後の一番大きものを取り出す
-        print(next(v for k, v in self.titles.items() if k == sorted_point[len(self.titles)-1][0]))
-
-    #軽くしてみる
-    def find_most_popular_pages2(self):
-        point_count = {}
-        prev_count = {}
-        for id in self.titles.keys():
-            point_count[id] = 1
-            prev_count[id] = 1
-        
-        for i in range(5):
-            for id in self.titles.keys():
-                point_count[id] -=prev_count[id]
-                if self.links[id] == []:
-                    for j in point_count.keys():
-                        point_count[j] += prev_count[id]/len(point_count)
-                for j in point_count.keys(): #ここが重い？
-                    point_count[j] += prev_count[id]*0.15/len(point_count)
-                    if j in self.links[id]:
-                        point_count[j] += prev_count[id]*0.85/len(self.links[id])
-            
-            for id in self.titles.keys():
-                prev_count[id] -=point_count[id]
-                if self.links[id] == []:
-                    for j in prev_count.keys():
-                        prev_count[j] += point_count[id]/len(prev_count)
-                for j in prev_count.keys(): #ここが重い？
-                    prev_count[j] += point_count[id]*0.15/len(prev_count)
-                    if j in self.links[id]:
-                        prev_count[j] += point_count[id]*0.85/len(self.links[id])
-            #print(prev_count)
-            #print(point_count)
-
-        sorted_point = sorted(point_count.items(), key=lambda x:x[1])#pointでソートする
-        print("find_most_popular_pages:")
-        #print(sorted_point)
-        print(sorted_point[len(self.titles)-1])#ソートした最後の一番大きものを取り出す
-        print(next(v for k, v in self.titles.items() if k == sorted_point[len(self.titles)-1][0]))
+        print(sorted_point[:6])
+        for id in range(6):
+            print(self.find_title(sorted_point[id][0]))
 
     # Homework #3 (optional):
     # Search the longest path with heuristics.
@@ -215,13 +197,12 @@ if __name__ == "__main__":
     # Example
     #wikipedia.find_most_linked_pages()
     # Homework #1
-    wikipedia.find_shortest_path("A", "F")
-    #wikipedia.find_shortest_path("C", "M")
+    #wikipedia.find_shortest_path("A", "F")
+    #wikipedia.find_shortest_path("C", "B")
     #wikipedia.find_shortest_path("渋谷", "パレートの法則")
     #wikipedia.find_shortest_path("渋谷", "9月22日")
     #wikipedia.find_shortest_path("渋谷", "小野妹子")
     # Homework #2
     wikipedia.find_most_popular_pages()
-    wikipedia.find_most_popular_pages2()
     # Homework #3 (optional)
     #wikipedia.find_longest_path("渋谷", "池袋")
